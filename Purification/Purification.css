@@ -1,0 +1,288 @@
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 400;
+	font-stretch: normal;
+	font-style: normal;
+	src: url('WOFF2/Purification-Regular.woff2') format('woff2'), url('TTF/Purification-Regular.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 400;
+	font-stretch: expanded;
+	font-style: normal;
+	src: url('WOFF2/Purification-Extended.woff2') format('woff2'), url('TTF/Purification-Extended.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 400;
+	font-stretch: condensed;
+	font-style: normal;
+	src: url('WOFF2/Purification-Condensed.woff2') format('woff2'), url('TTF/Purification-Condensed.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 400;
+	font-stretch: semi-condensed;
+	font-style: normal;
+	src: url('WOFF2/Purification-SemiCondensed.woff2') format('woff2'), url('TTF/Purification-SemiCondensed.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 400;
+	font-stretch: normal;
+	font-style: italic;
+	src: url('WOFF2/Purification-Italic.woff2') format('woff2'), url('TTF/Purification-Italic.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 400;
+	font-stretch: expanded;
+	font-style: italic;
+	src: url('WOFF2/Purification-ExtendedItalic.woff2') format('woff2'), url('TTF/Purification-ExtendedItalic.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 400;
+	font-stretch: condensed;
+	font-style: italic;
+	src: url('WOFF2/Purification-CondensedItalic.woff2') format('woff2'), url('TTF/Purification-CondensedItalic.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 400;
+	font-stretch: semi-condensed;
+	font-style: italic;
+	src: url('WOFF2/Purification-SemiCondensedItalic.woff2') format('woff2'), url('TTF/Purification-SemiCondensedItalic.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 700;
+	font-stretch: normal;
+	font-style: normal;
+	src: url('WOFF2/Purification-Bold.woff2') format('woff2'), url('TTF/Purification-Bold.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 700;
+	font-stretch: expanded;
+	font-style: normal;
+	src: url('WOFF2/Purification-ExtendedBold.woff2') format('woff2'), url('TTF/Purification-ExtendedBold.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 700;
+	font-stretch: condensed;
+	font-style: normal;
+	src: url('WOFF2/Purification-CondensedBold.woff2') format('woff2'), url('TTF/Purification-CondensedBold.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 700;
+	font-stretch: semi-condensed;
+	font-style: normal;
+	src: url('WOFF2/Purification-SemiCondensedBold.woff2') format('woff2'), url('TTF/Purification-SemiCondensedBold.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 700;
+	font-stretch: normal;
+	font-style: italic;
+	src: url('WOFF2/Purification-BoldItalic.woff2') format('woff2'), url('TTF/Purification-BoldItalic.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 700;
+	font-stretch: expanded;
+	font-style: italic;
+	src: url('WOFF2/Purification-ExtendedBoldItalic.woff2') format('woff2'), url('TTF/Purification-ExtendedBoldItalic.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 700;
+	font-stretch: condensed;
+	font-style: italic;
+	src: url('WOFF2/Purification-CondensedBoldItalic.woff2') format('woff2'), url('TTF/Purification-CondensedBoldItalic.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 700;
+	font-stretch: semi-condensed;
+	font-style: italic;
+	src: url('WOFF2/Purification-SemiCondensedBoldItalic.woff2') format('woff2'), url('TTF/Purification-SemiCondensedBoldItalic.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 300;
+	font-stretch: normal;
+	font-style: normal;
+	src: url('WOFF2/Purification-Light.woff2') format('woff2'), url('TTF/Purification-Light.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 300;
+	font-stretch: expanded;
+	font-style: normal;
+	src: url('WOFF2/Purification-ExtendedLight.woff2') format('woff2'), url('TTF/Purification-ExtendedLight.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 300;
+	font-stretch: condensed;
+	font-style: normal;
+	src: url('WOFF2/Purification-CondensedLight.woff2') format('woff2'), url('TTF/Purification-CondensedLight.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 300;
+	font-stretch: semi-condensed;
+	font-style: normal;
+	src: url('WOFF2/Purification-SemiCondensedLight.woff2') format('woff2'), url('TTF/Purification-SemiCondensedLight.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 300;
+	font-stretch: normal;
+	font-style: italic;
+	src: url('WOFF2/Purification-LightItalic.woff2') format('woff2'), url('TTF/Purification-LightItalic.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 300;
+	font-stretch: expanded;
+	font-style: italic;
+	src: url('WOFF2/Purification-ExtendedLightItalic.woff2') format('woff2'), url('TTF/Purification-ExtendedLightItalic.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 300;
+	font-stretch: condensed;
+	font-style: italic;
+	src: url('WOFF2/Purification-CondensedLightItalic.woff2') format('woff2'), url('TTF/Purification-CondensedLightItalic.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 300;
+	font-stretch: semi-condensed;
+	font-style: italic;
+	src: url('WOFF2/Purification-SemiCondensedLightItalic.woff2') format('woff2'), url('TTF/Purification-SemiCondensedLightItalic.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 500;
+	font-stretch: normal;
+	font-style: normal;
+	src: url('WOFF2/Purification-Medium.woff2') format('woff2'), url('TTF/Purification-Medium.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 500;
+	font-stretch: expanded;
+	font-style: normal;
+	src: url('WOFF2/Purification-ExtendedMedium.woff2') format('woff2'), url('TTF/Purification-ExtendedMedium.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 500;
+	font-stretch: condensed;
+	font-style: normal;
+	src: url('WOFF2/Purification-CondensedMedium.woff2') format('woff2'), url('TTF/Purification-CondensedMedium.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 500;
+	font-stretch: semi-condensed;
+	font-style: normal;
+	src: url('WOFF2/Purification-SemiCondensedMedium.woff2') format('woff2'), url('TTF/Purification-SemiCondensedMedium.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 500;
+	font-stretch: normal;
+	font-style: italic;
+	src: url('WOFF2/Purification-MediumItalic.woff2') format('woff2'), url('TTF/Purification-MediumItalic.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 500;
+	font-stretch: expanded;
+	font-style: italic;
+	src: url('WOFF2/Purification-ExtendedMediumItalic.woff2') format('woff2'), url('TTF/Purification-ExtendedMediumItalic.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 500;
+	font-stretch: condensed;
+	font-style: italic;
+	src: url('WOFF2/Purification-CondensedMediumItalic.woff2') format('woff2'), url('TTF/Purification-CondensedMediumItalic.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Purification Web';
+	font-display: swap;
+	font-weight: 500;
+	font-stretch: semi-condensed;
+	font-style: italic;
+	src: url('WOFF2/Purification-SemiCondensedMediumItalic.woff2') format('woff2'), url('TTF/Purification-SemiCondensedMediumItalic.ttf') format('truetype');
+}
