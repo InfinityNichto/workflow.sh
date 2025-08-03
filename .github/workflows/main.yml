@@ -34,3 +34,4 @@ jobs:
             COMMIT_MESSAGE="${COMMIT_MSG:-Apply changes from workflow.sh}"
             git commit -m "$COMMIT_MESSAGE"
             git push
+          fi
