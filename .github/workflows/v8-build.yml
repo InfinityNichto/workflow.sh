@@ -30,7 +30,7 @@ jobs:
           git fetch --tags origin
           git fetch origin '+refs/branch-heads/*:refs/remotes/origin/branch-heads/*'
           git checkout refs/tags/10.0.139.9
-          gclient sync -D
+          gclient sync
 
       - name: Setup Android NDK
         run: |
@@ -53,7 +53,6 @@ jobs:
             v8_use_external_startup_data=false
             v8_enable_i18n_support=false
             v8_static_library=true
-            android_ndk_root="'"$HOME/.android-sdk-root/ndk/27.0.12077973"'"
             android_api_level=26
             clang_use_chrome_plugins=false
             treat_warnings_as_errors=false
