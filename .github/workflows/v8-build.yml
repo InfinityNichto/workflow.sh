@@ -20,12 +20,12 @@ jobs:
         run: |
           git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
           echo "${GITHUB_WORKSPACE}/depot_tools" >> $GITHUB_PATH
-
+      
       - name: Fetch V8
         run: |
           rm -rf v8
-          fetch v8
-          cd v8
+          mkdir v8 && cd v8
+          fetch --nohooks v8
           git checkout 10.0.139.9
           gclient sync -D
 
