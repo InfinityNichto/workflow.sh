@@ -43,7 +43,7 @@ jobs:
 
       - name: Configure GN
         run: |
-          cd v8
+          cd deps/v8
           gn gen out/android_arm64 --args='
             target_os="android"
             target_cpu="arm64"
@@ -61,20 +61,20 @@ jobs:
 
       - name: Build V8
         run: |
-          cd v8
+          cd deps/v8
           ninja -C out/android_arm64 v8_monolith
 
       - name: Upload headers
         uses: actions/upload-artifact@v4
         with:
           name: v8-headers
-          path: v8/include
+          path: deps/v8/include
 
       - name: Upload library
         uses: actions/upload-artifact@v4
         with:
           name: v8-lib
-          path: v8/out/android_arm64/obj/libv8_monolith.a
+          path: deps/v8/out/android_arm64/obj/libv8_monolith.a
 
       - name: Clean all embedded .git dirs
         run: |
