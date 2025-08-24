@@ -23,6 +23,7 @@ jobs:
 
       - name: Fetch V8
         run: |
+          rm -rf v8
           fetch v8
           cd v8
           git checkout 10.0.139.9
@@ -71,3 +72,8 @@ jobs:
         with:
           name: v8-lib
           path: v8/out/android_arm64/obj/libv8_monolith.a
+
+      - name: Clean all embedded .git dirs
+        run: |
+          find v8 -name ".git" -type d -prune -exec rm -rf {} +
+          rm -rf depot_tools/.git
