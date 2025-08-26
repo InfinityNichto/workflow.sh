@@ -1,81 +1,156 @@
-name: Build V8 Android ARM64
+name: Build V8 for Android
 
 on:
   workflow_dispatch:
+    inputs:
+      target_arch:
+        description: 'Target architecture'
+        required: false
+        default: 'arm64'
+        type: choice
+        options:
+        - arm
+        - arm64
+        - x86
+        - x64
+      build_type:
+        description: 'Build type'
+        required: false
+        default: 'release'
+        type: choice
+        options:
+        - release
+        - debug
 
 jobs:
-  build-v8:
-    runs-on: ubuntu-22.04
-
+  build-v8-android:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [arm, arm64, x86, x64]
+        build_type: [release]
+      fail-fast: false
+    
     steps:
-      - name: Checkout workflow repo
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+        
+    - name: Setup Android NDK
+      uses: nttld/setup-ndk@v1
+      with:
+        ndk-version: r25c
+        
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git python3 python3-pip build-essential
+        sudo apt-get install -y ninja-build pkg-config
+        
+    - name: Setup depot_tools
+      run: |
+        git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+        echo "$PWD/depot_tools" >> $GITHUB_PATH
+        
+    - name: Configure environment
+      run: |
+        echo "ANDROID_NDK_ROOT=$ANDROID_NDK_ROOT" >> $GITHUB_ENV
+        echo "PATH=$PWD/depot_tools:$PATH" >> $GITHUB_ENV
+        
+    - name: Make build script executable
+      run: chmod +x ./build_v8_android.sh
+      
+    - name: Build V8 for Android
+      run: |
+        ./build_v8_android.sh \
+          --arch=${{ matrix.arch }} \
+          --build-type=${{ matrix.build_type }} \
+          --android-ndk-path=$ANDROID_NDK_ROOT
+      env:
+        ANDROID_NDK_ROOT: ${{ env.ANDROID_NDK_ROOT }}
+        
+    - name: Prepare artifacts
+      run: |
+        mkdir -p artifacts/v8-android-${{ matrix.arch }}-${{ matrix.build_type }}
+        
+        # Copy built libraries
+        if [ -d "v8/out.gn" ]; then
+          find v8/out.gn -name "*.so" -o -name "*.a" | \
+            xargs -I {} cp {} artifacts/v8-android-${{ matrix.arch }}-${{ matrix.build_type }}/
+        fi
+        
+        # Copy headers
+        if [ -d "v8/include" ]; then
+          cp -r v8/include artifacts/v8-android-${{ matrix.arch }}-${{ matrix.build_type }}/
+        fi
+        
+        # Copy build info
+        echo "Build Info:" > artifacts/v8-android-${{ matrix.arch }}-${{ matrix.build_type }}/build_info.txt
+        echo "Architecture: ${{ matrix.arch }}" >> artifacts/v8-android-${{ matrix.arch }}-${{ matrix.build_type }}/build_info.txt
+        echo "Build Type: ${{ matrix.build_type }}" >> artifacts/v8-android-${{ matrix.arch }}-${{ matrix.build_type }}/build_info.txt
+        echo "Build Date: $(date)" >> artifacts/v8-android-${{ matrix.arch }}-${{ matrix.build_type }}/build_info.txt
+        echo "Commit: ${{ github.sha }}" >> artifacts/v8-android-${{ matrix.arch }}-${{ matrix.build_type }}/build_info.txt
+        
+        # List contents
+        ls -la artifacts/v8-android-${{ matrix.arch }}-${{ matrix.build_type }}/
+        
+    - name: Upload V8 Android artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: v8-android-${{ matrix.arch }}-${{ matrix.build_type }}
+        path: artifacts/v8-android-${{ matrix.arch }}-${{ matrix.build_type }}/*
+        retention-days: 30
+        
+    - name: Upload build logs
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-logs-${{ matrix.arch }}-${{ matrix.build_type }}
+        path: |
+          *.log
+          v8/**/*.log
+        retention-days: 7
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3 git curl build-essential ninja-build pkg-config
-
-      - name: Setup depot_tools
-        run: |
-          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
-          echo "${GITHUB_WORKSPACE}/depot_tools" >> $GITHUB_PATH
-
-      - name: Fetch V8
-        run: |
-          mkdir -p deps
-          cd deps
-          fetch v8
-          cd v8
-          git fetch --tags origin
-          git fetch origin '+refs/branch-heads/*:refs/remotes/origin/branch-heads/*'
-          git checkout refs/tags/10.0.139.9
-          gclient sync
-
-      - name: Setup Android NDK
-        run: |
-          mkdir -p $HOME/.android-sdk-root/ndk
-          cd $HOME/.android-sdk-root/ndk
-          curl -L https://dl.google.com/android/repository/android-ndk-r27b-linux.zip -o ndk.zip
-          unzip -q ndk.zip
-          mv android-ndk-r27b 27.0.12077973
-          rm ndk.zip
-
-      - name: Configure GN
-        run: |
-          cd deps/v8
-          gn gen out/android_arm64 --args='
-            target_os="android"
-            target_cpu="arm64"
-            v8_target_cpu="arm64"
-            is_debug=false
-            v8_monolithic=true
-            v8_use_external_startup_data=false
-            v8_enable_i18n_support=false
-            v8_static_library=true
-            android_api_level=26
-            clang_use_chrome_plugins=false
-            treat_warnings_as_errors=false
-          '
-
-      - name: Build V8
-        run: |
-          cd deps/v8
-          ninja -C out/android_arm64 v8_monolith
-
-      - name: Upload headers
-        uses: actions/upload-artifact@v4
-        with:
-          name: v8-headers
-          path: deps/v8/include
-
-      - name: Upload library
-        uses: actions/upload-artifact@v4
-        with:
-          name: v8-lib
-          path: deps/v8/out/android_arm64/obj/libv8_monolith.a
-
-      - name: Clean all embedded .git dirs
-        run: |
-          find v8 -name ".git" -type d -prune -exec rm -rf {} +
-          rm -rf depot_tools/.git
+  create-release-bundle:
+    needs: build-v8-android
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: v8-android-*
+        merge-multiple: true
+        
+    - name: Create release bundle
+      run: |
+        mkdir -p release-bundle
+        
+        # Organize by architecture
+        for arch in arm arm64 x86 x64; do
+          if [ -d "v8-android-${arch}-release" ]; then
+            mkdir -p "release-bundle/${arch}"
+            cp -r v8-android-${arch}-release/* "release-bundle/${arch}/"
+          fi
+        done
+        
+        # Create combined package info
+        echo "V8 Android Build Bundle" > release-bundle/README.txt
+        echo "Generated: $(date)" >> release-bundle/README.txt
+        echo "Architectures: $(ls release-bundle/ | grep -v README.txt | tr '\n' ' ')" >> release-bundle/README.txt
+        
+        # Create archive
+        tar -czf v8-android-bundle.tar.gz -C release-bundle .
+        
+    - name: Upload release bundle
+      uses: actions/upload-artifact@v4
+      with:
+        name: v8-android-complete-bundle
+        path: v8-android-bundle.tar.gz
+        retention-days: 90
