@@ -1,6 +1,10 @@
 name: Build V8 for Android
 
 on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
     inputs:
       target_arch:
@@ -62,15 +66,19 @@ jobs:
         echo "ANDROID_NDK_ROOT=$ANDROID_NDK_ROOT" >> $GITHUB_ENV
         echo "PATH=$PWD/depot_tools:$PATH" >> $GITHUB_ENV
         
-    - name: Make build script executable
-      run: chmod +x ./build_v8_android.sh
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install Yarn
+      run: npm install -g yarn
+        
+    - name: Setup V8 dependencies
+      run: yarn setup
       
     - name: Build V8 for Android
-      run: |
-        ./build_v8_android.sh \
-          --arch=${{ matrix.arch }} \
-          --build-type=${{ matrix.build_type }} \
-          --android-ndk-path=$ANDROID_NDK_ROOT
+      run: yarn start
       env:
         ANDROID_NDK_ROOT: ${{ env.ANDROID_NDK_ROOT }}
         
@@ -78,16 +86,14 @@ jobs:
       run: |
         mkdir -p artifacts/v8-android-${{ matrix.arch }}-${{ matrix.build_type }}
         
-        # Copy built libraries
-        if [ -d "v8/out.gn" ]; then
-          find v8/out.gn -name "*.so" -o -name "*.a" | \
-            xargs -I {} cp {} artifacts/v8-android-${{ matrix.arch }}-${{ matrix.build_type }}/
+        # Copy built libraries from dist folder
+        if [ -d "dist" ]; then
+          cp -r dist/* artifacts/v8-android-${{ matrix.arch }}-${{ matrix.build_type }}/
         fi
         
-        # Copy headers
-        if [ -d "v8/include" ]; then
-          cp -r v8/include artifacts/v8-android-${{ matrix.arch }}-${{ matrix.build_type }}/
-        fi
+        # Copy from any build output directories
+        find . -name "*.so" -o -name "*.a" -o -name "libv8*.so" | \
+          xargs -I {} cp {} artifacts/v8-android-${{ matrix.arch }}-${{ matrix.build_type }}/ 2>/dev/null || true
         
         # Copy build info
         echo "Build Info:" > artifacts/v8-android-${{ matrix.arch }}-${{ matrix.build_type }}/build_info.txt
