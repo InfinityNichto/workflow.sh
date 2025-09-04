@@ -1,7 +1,11 @@
 #!/bin/bash
 set -e
 
-rm -rf v8 depot_tools
-rm ./.gclient* ./.gcs*
+sudo apt install yarn
 
-echo "COMMIT_MSG=remove old v8" >> "$GITHUB_ENV"
+git clone https://github.com/Kudo/v8-android-buildscripts
+cd v8-android-buildscripts
+yarn setup
+yarn start
+
+echo "COMMIT_MSG=v8 android buildscripts" >> "$GITHUB_ENV"
