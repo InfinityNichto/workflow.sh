@@ -1,8 +1,4 @@
 #!/bin/bash
-set -e
-
-sudo apt install yarn
-#!/bin/bash
 
 PACKAGE="v8-android"
 VERSIONS=$(npm view $PACKAGE versions --json | jq -r '.[]')
