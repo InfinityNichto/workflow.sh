@@ -2,4 +2,5 @@
 
 set -euo pipefail
 
-ls -laR $HOME
+pwd
+ls -la $PWD
