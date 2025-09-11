@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -euo pipefail
-
 REPO="Kudo/v8-android-buildscripts"
 API_URL="https://api.github.com/repos/$REPO/releases"
 TMPDIR="github-v8-releases"
