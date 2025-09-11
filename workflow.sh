@@ -9,24 +9,25 @@ TMPDIR="github-v8-releases"
 mkdir -p "$TMPDIR"
 cd "$TMPDIR"
 
-# Fetch release data from GitHub API
+# Get all releases
 curl -s "$API_URL" | jq -c '.[]' | while read -r release; do
   TAG_NAME=$(echo "$release" | jq -r '.tag_name')
-  echo "🔸 Release: $TAG_NAME"
+  echo -e "\n🔸 Release: $TAG_NAME"
 
   echo "$release" | jq -c '.assets[]' | while read -r asset; do
     ASSET_NAME=$(echo "$asset" | jq -r '.name')
     DOWNLOAD_URL=$(echo "$asset" | jq -r '.browser_download_url')
 
-    # Only archive files
+    # Skip non-archives
     if [[ ! "$ASSET_NAME" =~ \.(zip|tar\.gz|tgz)$ ]]; then
-      echo "   ⏭️  Skipping: $ASSET_NAME (not archive)"
+      echo "   ⏭️  Skipping non-archive: $ASSET_NAME"
       continue
     fi
 
     ARCHIVE_FILE="${TAG_NAME}-${ASSET_NAME}"
     EXTRACT_DIR="${TAG_NAME}-${ASSET_NAME%.*}"
 
+    # Download if needed
     if [[ -f "$ARCHIVE_FILE" ]]; then
       echo "   ✅ Already downloaded: $ASSET_NAME"
     else
@@ -34,50 +35,60 @@ curl -s "$API_URL" | jq -c '.[]' | while read -r release; do
       curl -sL "$DOWNLOAD_URL" -o "$ARCHIVE_FILE"
     fi
 
-    echo "   📦 Extracting to: $EXTRACT_DIR"
+    # Extract archive
+    echo "   📦 Extracting archive to: $EXTRACT_DIR"
     mkdir -p "$EXTRACT_DIR"
 
-    # Extract the zip/tar file
     if [[ "$ARCHIVE_FILE" == *.zip ]]; then
       unzip -q "$ARCHIVE_FILE" -d "$EXTRACT_DIR"
     elif [[ "$ARCHIVE_FILE" == *.tar.gz || "$ARCHIVE_FILE" == *.tgz ]]; then
       tar -xzf "$ARCHIVE_FILE" -C "$EXTRACT_DIR"
     fi
 
-    # Find and extract dist.tar if present
-    DIST_TAR=$(find "$EXTRACT_DIR" -type f -name "dist.tar" | head -n 1)
-    if [[ -n "$DIST_TAR" ]]; then
-      DIST_DIR="${EXTRACT_DIR}/_dist"
-      mkdir -p "$DIST_DIR"
-      tar -xf "$DIST_TAR" -C "$DIST_DIR"
-    else
-      echo "   ❌ No dist.tar found in $EXTRACT_DIR"
+    # Find inner archive (dist.tar or similar)
+    INNER_ARCHIVE=$(find "$EXTRACT_DIR" -maxdepth 1 -type f -name "*.tar" | head -n1)
+    if [[ -z "$INNER_ARCHIVE" ]]; then
+      echo "   ❌ No inner .tar found in $ASSET_NAME"
       continue
     fi
 
-    # Find .so files in dist directory
-    echo "   🔍 Searching for .so files in dist..."
-    mapfile -t SO_FILES < <(find "$DIST_DIR" -type f -name "*.so")
+    INNER_DIR="${EXTRACT_DIR}/_dist_extracted"
+    mkdir -p "$INNER_DIR"
+    echo "   📦 Extracting inner tar: $(basename "$INNER_ARCHIVE")"
+    tar -xf "$INNER_ARCHIVE" -C "$INNER_DIR"
+
+    # Show directory structure
+    echo "   📂 Tree of inner contents:"
+    if command -v tree &> /dev/null; then
+      tree -a -L 6 "$INNER_DIR"
+    else
+      find "$INNER_DIR"
+    fi
+
+    # Find all .so files
+    mapfile -t SO_FILES < <(find "$INNER_DIR" -type f -name "*.so")
 
     if [[ ${#SO_FILES[@]} -eq 0 ]]; then
-      echo "   ⚠️  No .so files found."
+      echo "   ❌ No .so files found."
       continue
     fi
 
+    echo "   🔍 Found ${#SO_FILES[@]} .so file(s):"
     for so_file in "${SO_FILES[@]}"; do
-      echo ""
-      echo "🔹 Found: $so_file"
+      echo -e "\n   — $so_file"
+      echo -n "     SHA256: "
+      sha256sum "$so_file" | awk '{print $1}'
 
-      HASH=$(sha256sum "$so_file" | awk '{print $1}')
-      echo "   SHA256: $HASH"
+      echo -n "     FILE:   "
+      file "$so_file"
 
-      FILE_TYPE=$(file "$so_file")
-      echo "   File: $FILE_TYPE"
-
-      VERSION=$(strings "$so_file" | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?' | sort -Vu | head -n 1)
-      echo "   Version (from strings): ${VERSION:-N/A}"
+      VERSION=$(strings "$so_file" | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?' | sort -u | head -n1)
+      if [[ -n "$VERSION" ]]; then
+        echo "     VERSION: $VERSION"
+      else
+        echo "     VERSION: not found"
+      fi
     done
 
-    echo ""
   done
 done
