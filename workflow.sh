@@ -5,37 +5,54 @@ set -euo pipefail
 REPO="Kudo/v8-android-buildscripts"
 API_URL="https://api.github.com/repos/$REPO/releases"
 TMPDIR="github-v8-releases"
+TARGET="snapshot_blob.bin"
+
+# Make sure target exists
+if [[ ! -f "$TARGET" ]]; then
+  echo "❌ Target snapshot_blob.bin not found at $TARGET"
+  exit 1
+fi
+
+# Prep target info
+echo "🔍 Target: $TARGET"
+TARGET_SIZE=$(stat -c "%s" "$TARGET")
+TARGET_HEAD_HASH=$(head -c 1024 "$TARGET" | sha256sum | cut -d ' ' -f1)
+TARGET_TAIL_HASH=$(tail -c 1024 "$TARGET" | sha256sum | cut -d ' ' -f1)
+TARGET_STRINGS=$(strings "$TARGET" | sort -u)
+TOTAL_TARGET_STRINGS=$(echo "$TARGET_STRINGS" | wc -l)
+
+echo "📦 Size: $TARGET_SIZE bytes"
+echo "🔑 Head hash: $TARGET_HEAD_HASH"
+echo "🔑 Tail hash: $TARGET_TAIL_HASH"
+echo
 
 mkdir -p "$TMPDIR"
 cd "$TMPDIR"
 
-# Fetch release data
+# Download & extract GitHub releases
 curl -s "$API_URL" | jq -c '.[]' | while read -r release; do
-  TAG_NAME=$(echo "$release" | jq -r '.tag_name')
-  echo -e "\n🔸 Release: $TAG_NAME"
+  TAG=$(echo "$release" | jq -r '.tag_name')
+  echo -e "\n🔸 Processing release: $TAG"
 
   echo "$release" | jq -c '.assets[]' | while read -r asset; do
-    ASSET_NAME=$(echo "$asset" | jq -r '.name')
-    DOWNLOAD_URL=$(echo "$asset" | jq -r '.browser_download_url')
+    NAME=$(echo "$asset" | jq -r '.name')
+    URL=$(echo "$asset" | jq -r '.browser_download_url')
 
-    # Skip non-archives
-    if [[ ! "$ASSET_NAME" =~ \.(zip|tar\.gz|tgz)$ ]]; then
-      echo "   ⏭️  Skipping: $ASSET_NAME"
+    if [[ ! "$NAME" =~ \.(zip|tar\.gz|tgz)$ ]]; then
+      echo "   ⏭️  Skipping non-archive: $NAME"
       continue
     fi
 
-    ARCHIVE_FILE="${TAG_NAME}-${ASSET_NAME}"
-    EXTRACT_DIR="${TAG_NAME}-${ASSET_NAME%.*}"
+    ARCHIVE_FILE="${TAG}-${NAME}"
+    EXTRACT_DIR="${TAG}-${NAME%.*}"
 
-    # Download if needed
     if [[ ! -f "$ARCHIVE_FILE" ]]; then
-      echo "   ⬇️  Downloading: $ASSET_NAME"
-      curl -sL "$DOWNLOAD_URL" -o "$ARCHIVE_FILE"
+      echo "   ⬇️  Downloading: $NAME"
+      curl -sL "$URL" -o "$ARCHIVE_FILE"
     else
-      echo "   ✅ Already downloaded: $ASSET_NAME"
+      echo "   ✅ Already downloaded: $NAME"
     fi
 
-    # Extract top-level archive
     mkdir -p "$EXTRACT_DIR"
     echo "   📦 Extracting: $ARCHIVE_FILE"
     if [[ "$ARCHIVE_FILE" == *.zip ]]; then
@@ -44,34 +61,53 @@ curl -s "$API_URL" | jq -c '.[]' | while read -r release; do
       tar -xzf "$ARCHIVE_FILE" -C "$EXTRACT_DIR"
     fi
 
-    # Look for inner tar (e.g., dist.tar)
-    INNER_ARCHIVE=$(find "$EXTRACT_DIR" -maxdepth 1 -type f -name "*.tar" | head -n1)
-    if [[ -z "$INNER_ARCHIVE" ]]; then
-      echo "   ❌ No inner .tar file found"
+    INNER_TAR=$(find "$EXTRACT_DIR" -maxdepth 1 -type f -name "*.tar" | head -n1)
+    if [[ -z "$INNER_TAR" ]]; then
+      echo "   ❌ No inner tar found"
       continue
     fi
 
     INNER_DIR="${EXTRACT_DIR}/_dist_extracted"
     mkdir -p "$INNER_DIR"
-    echo "   📦 Extracting inner archive: $(basename "$INNER_ARCHIVE")"
-    tar -xf "$INNER_ARCHIVE" -C "$INNER_DIR"
+    tar -xf "$INNER_TAR" -C "$INNER_DIR"
 
-    # Find all snapshot_blob.bin files
-    mapfile -t SNAPSHOT_FILES < <(find "$INNER_DIR" -type f -name "snapshot_blob.bin")
+    # Look for snapshot_blob.bin
+    mapfile -t BLOBS < <(find "$INNER_DIR" -type f -name "snapshot_blob.bin")
 
-    if [[ ${#SNAPSHOT_FILES[@]} -eq 0 ]]; then
-      echo "   ❌ No snapshot_blob.bin files found"
+    if [[ ${#BLOBS[@]} -eq 0 ]]; then
+      echo "   ❌ No snapshot_blob.bin found"
       continue
     fi
 
-    echo "   🔍 Found ${#SNAPSHOT_FILES[@]} snapshot_blob.bin file(s):"
-    for blob in "${SNAPSHOT_FILES[@]}"; do
-      echo -e "\n   — $blob"
-      echo -n "     SHA256: "
-      sha256sum "$blob" | awk '{print $1}'
-      echo -n "     FILE:   "
-      file "$blob"
-    done
+    echo "   🔍 Found ${#BLOBS[@]} snapshot_blob.bin file(s):"
 
+    for BLOB in "${BLOBS[@]}"; do
+      echo -e "\n   — $BLOB"
+
+      SIZE=$(stat -c "%s" "$BLOB")
+      HEAD_HASH=$(head -c 1024 "$BLOB" | sha256sum | cut -d ' ' -f1)
+      TAIL_HASH=$(tail -c 1024 "$BLOB" | sha256sum | cut -d ' ' -f1)
+
+      echo "     Size:        $SIZE bytes"
+      echo "     Head hash:   $HEAD_HASH"
+      echo "     Tail hash:   $TAIL_HASH"
+
+      [[ "$SIZE" == "$TARGET_SIZE" ]] && echo "     ✅ Size match"
+      [[ "$HEAD_HASH" == "$TARGET_HEAD_HASH" ]] && echo "     ✅ Head hash match"
+      [[ "$TAIL_HASH" == "$TARGET_TAIL_HASH" ]] && echo "     ✅ Tail hash match"
+
+      echo -n "     FILE:        "
+      file "$BLOB"
+
+      MATCHED_STRINGS=$(strings "$BLOB" | grep -Fxf <(echo "$TARGET_STRINGS") | wc -l)
+      PERCENT=$((MATCHED_STRINGS * 100 / TOTAL_TARGET_STRINGS))
+      echo "     📊 String overlap: $MATCHED_STRINGS / $TOTAL_TARGET_STRINGS ($PERCENT%)"
+
+      if command -v ssdeep &> /dev/null; then
+        echo "     🔍 Fuzzy match (ssdeep):"
+        ssdeep -bm "$TARGET" "$BLOB"
+      fi
+
+    done
   done
 done
