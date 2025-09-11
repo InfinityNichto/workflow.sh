@@ -2,4 +2,4 @@
 
 set -euo pipefail
 
-ls -la $HOME
+ls -laR $HOME
