@@ -3,8 +3,11 @@ if [ ! -e "android-ndk-r23c-linux.zip" ]; then
   unzip android-ndk-r23c-linux -d ndk
 fi
 
-export CC="./ndk/android-ndk-r23c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android26-clang"
-export AR="./ndk/android-ndk-r23c/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar"
+# export CC="./ndk/android-ndk-r23c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android26-clang"
+# export AR="./ndk/android-ndk-r23c/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar"
+
+export CC=$(find ./ndk/ -name "aarch64-linux-android26-clang")
+export AR=$(find ./ndk/ -name "llvm-ar")
 
 if [ -e "tinycc" ]; then
   rm -rf tinycc
