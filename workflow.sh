@@ -1,10 +1,10 @@
 if [ ! -e "android-ndk-r23c-macos.zip" ]; then
-  wget -q https://dl.google.com/android/repository/android-ndk-r23c-darwin.dmg
-  hdiutil attach -mountpoint /tmp/tmpmount android-ndk-r23c-darwin.dmg
+  wget -q https://dl.google.com/android/repository/android-ndk-r28c-darwin.dmg
+  hdiutil attach -mountpoint /tmp/tmpmount android-ndk-r28c-darwin.dmg
   mkdir ndk
   cp -r /tmp/tmpmount/* ndk
   hdiutil detach /tmp/tmpmount
-  rm android-ndk-r23c-darwin.dmg
+  rm android-ndk-r28c-darwin.dmg
 fi
 
 # export CC="./ndk/android-ndk-r23c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android26-clang"
@@ -14,7 +14,6 @@ export CC=$(find ./ndk/ -name "aarch64-linux-android26-clang")
 export AR=$(find ./ndk/ -name "llvm-ar")
 
 if [ -e "tinycc" ]; then
-  rm -rf tinycc
   git rm --cached tinycc
 fi
 
