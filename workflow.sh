@@ -1,6 +1,7 @@
 if [ ! -e "android-ndk-r23c-macos.zip" ]; then
-  wget -q https://dl.google.com/android/repository/android-ndk-r23c-darwin.dmg > /dev/null 2>&1
-  unzip android-ndk-r23c-macos.zip -d ndk > /dev/null 2>&1
+  wget https://dl.google.com/android/repository/android-ndk-r23c-darwin.dmg
+  unzip android-ndk-r23c-macos.zip -d ndk
+  rm android-ndk-r23c-macoz.zip
 fi
 
 # export CC="./ndk/android-ndk-r23c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android26-clang"
@@ -28,4 +29,4 @@ make
 # tree ndk/android-ndk-r23c
 
 # here to prevent triggering max push limit (100MB)
-rm -rf ndk android-ndk-r23c-linux.zip # too lazy to add untrack feature, just delete the entire thing before automatic track
+rm -rf ndk # too lazy to add untrack feature, just delete the entire thing before automatic track
