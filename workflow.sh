@@ -1,5 +1,6 @@
-if [ -d "tinycc" ]; then
+if [ -e "tinycc" ]; then
   rm -rf tinycc
+  git rm --cached tinycc
 fi
 
 git clone https://github.com/TinyCC/tinycc
