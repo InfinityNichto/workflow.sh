@@ -1,6 +1,6 @@
 if [ ! -e "android-ndk-r23c-macos.zip" ]; then
-  wget https://dl.google.com/android/repository/android-ndk-r23c-macos.zip
-  unzip android-ndk-r23c-macos.zip -d ndk
+  wget -q https://dl.google.com/android/repository/android-ndk-r23c-darwin.dmg > /dev/null 2>&1
+  unzip android-ndk-r23c-macos.zip -d ndk > /dev/null 2>&1
 fi
 
 # export CC="./ndk/android-ndk-r23c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android26-clang"
