@@ -1,6 +1,7 @@
 if [ ! -e "android-ndk-r23c-macos.zip" ]; then
   wget -q https://dl.google.com/android/repository/android-ndk-r23c-darwin.dmg
   hdiutil attach -mountpoint /tmp/tmpmount android-ndk-r23c-darwin.dmg
+  mkdir ndk
   cp -r /tmp/tmpmount/* ndk
   hdiutil detach /tmp/tmpmount
   rm android-ndk-r23c-darwin.dmg
