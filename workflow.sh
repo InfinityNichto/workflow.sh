@@ -20,3 +20,5 @@ sudo apt install build-essential
 make clean
 ./configure --cc=$CC --ar=$AR --cpu=arm64 --extra-cflags="-fPIC"
 make
+
+rm -rf ndk # too lazy to add untrack feature, just delete the entire thing before automatic track
