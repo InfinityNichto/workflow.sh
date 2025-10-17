@@ -1,6 +1,6 @@
-if [ ! -e "android-ndk-r23c-linux.zip" ]; then
-  wget https://dl.google.com/android/repository/android-ndk-r23c-linux.zip
-  unzip android-ndk-r23c-linux -d ndk
+if [ ! -e "android-ndk-r23c-macos.zip" ]; then
+  wget https://dl.google.com/android/repository/android-ndk-r23c-macos.zip
+  unzip android-ndk-r23c-macos.zip -d ndk
 fi
 
 # export CC="./ndk/android-ndk-r23c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android26-clang"
@@ -18,7 +18,7 @@ git clone https://github.com/TinyCC/tinycc
 cd tinycc
 rm -rf .git
 
-sudo apt install build-essential
+brew install make
 
 make clean
 ./configure --cc=$CC --ar=$AR --cpu=arm64 --extra-cflags="-fPIC"
