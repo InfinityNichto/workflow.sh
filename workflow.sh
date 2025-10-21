@@ -4,7 +4,7 @@ wget -q -O libil2cpp.so.i64 "https://drive.usercontent.google.com/download?id=1c
 
 idapro/idat -A -S"decomp_export.py" libil2cpp.so.i64
 
-rm -rf idapro
+# rm -rf idapro
 rm idapro.7z
 rm libil2cpp.so.i64
 
