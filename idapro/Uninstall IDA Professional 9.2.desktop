@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Version=0.9.4
+Name=Uninstall IDA Professional 9.2
+Comment=Uninstall
+Icon=
+Exec=/home/lisa/Downloads/dev/misc/ida-pro-9.2/uninstall
+Terminal=false
+Path=/home/lisa/Downloads/dev/misc/ida-pro-9.2
