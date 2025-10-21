@@ -1,34 +1,6 @@
-if [ ! -e "android-ndk-r23c-macos.zip" ]; then
-  wget -q https://dl.google.com/android/repository/android-ndk-r28c-darwin.dmg
-  hdiutil attach -mountpoint /tmp/tmpmount android-ndk-r28c-darwin.dmg
-  mkdir ndk
-  cp -r /tmp/tmpmount/* ndk
-  hdiutil detach /tmp/tmpmount
-  rm android-ndk-r28c-darwin.dmg
-fi
+wget "https://pixeldrain.com/api/file/F6y7J6A4?download"
+file "F6y7J6A4?download"
+rm "F6y7J6A4?download"
 
-# export CC="./ndk/android-ndk-r23c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android26-clang"
-# export AR="./ndk/android-ndk-r23c/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar"
-
-export CC=$(find ./ndk/ -name "aarch64-linux-android26-clang")
-export AR=$(find ./ndk/ -name "llvm-ar")
-
-if [ -e "tinycc" ]; then
-  git rm --cached tinycc
-fi
-
-git clone https://github.com/TinyCC/tinycc
-cd tinycc
-rm -rf .git
-
-brew install make
-
-make clean
-./configure --cc=$CC --ar=$AR --cpu=arm64 --extra-cflags="-fPIC"
-make
-
-# sudo apt install tree
-# tree ndk/android-ndk-r23c
-
-# here to prevent triggering max push limit (100MB)
-rm -rf ndk # too lazy to add untrack feature, just delete the entire thing before automatic track
+# echo "COMMIT_MSG=message" >> "$GITHUB_ENV"
+echo "COMMIT_MSG=idapro on CI test" >> "$GITHUB_ENV"
