@@ -1,15 +1,7 @@
-# wget -q -O idapro.7z "https://drive.usercontent.google.com/download?id=146osHMZxQyiA64QPKdOgUCukMpe6LH9U&export=download&authuser=1&confirm=t&uuid=5fe429a2-ae23-454e-afb3-3294752f4e46&at=AKSUxGPTby3v_gEWorHFWDBq6CV6:1761034267700"
-wget -q -O libil2cpp.so.i64 "https://drive.usercontent.google.com/download?id=1c2qUfK_BCQDwgZ4Q4axTFQGLOFGN9uMK&export=download&authuser=1&confirm=t&uuid=470bb2af-5fa5-4d26-96e3-0dccc3beb377&at=AKSUxGNsmriOXEGLuu8leglPSAk-:1761033921133"
-# 7z x idapro.7z -o./idapro > /dev/null 2>&1
-# 7z x idadot.7z -o./.idapro > /dev/null 2>&1
-
-ln -s ./.idapro ~/.idapro
-
-idapro/idat -A -S"decomp_export.py" libil2cpp.so.i64
-
-# rm -rf idapro
-# rm idapro.7z
-rm libil2cpp.so.i64
+wget -q -O assets-and-metadata.zip "https://drive.usercontent.google.com/download?id=1xkRurYw4Mq7ElELBQuzblvpkeGLkupXR&export=download&authuser=0&confirm=t&uuid=35257ead-a735-42e4-8e4a-cb2f06a3063a&at=ALWLOp4wU6nDXy5z_00KCsfx-jqA%3A1762773101937"
+unzip assets-and-metadata.zip -d assets-and-metadata
+mv assets-and-metadata/global-metadata.dat .
+rm -rf assets-and-metadata
 
 # echo "COMMIT_MSG=message" >> "$GITHUB_ENV"
-echo "COMMIT_MSG=please work" >> "$GITHUB_ENV"
+echo "COMMIT_MSG=extract global-metadata.dat" >> "$GITHUB_ENV"
